@@ -281,9 +281,9 @@ function App() {
     setPreferences(prev => ({
       ...prev,
       toolUsageStats: {
-        ...prev.toolUsageStats,
+        ...(prev.toolUsageStats || {}),
         [toolId]: {
-          count: (prev.toolUsageStats[toolId]?.count || 0) + 1,
+          count: ((prev.toolUsageStats || {})[toolId]?.count || 0) + 1,
           lastUsed: now
         }
       }
@@ -357,11 +357,13 @@ function App() {
   // Get top 20 tools by usage
   const getTopTools = () => {
     const allTools = [...getAllTools(), ...customTools];
+    const safeToolUsageStats = preferences.toolUsageStats || {};
+    
     const toolsWithUsage = allTools
       .map(tool => ({
         tool,
-        usageCount: preferences.toolUsageStats[tool.id]?.count || 0,
-        lastUsed: preferences.toolUsageStats[tool.id]?.lastUsed
+        usageCount: safeToolUsageStats[tool.id]?.count || 0,
+        lastUsed: safeToolUsageStats[tool.id]?.lastUsed
       }))
       .filter(item => item.usageCount > 0)
       .sort((a, b) => b.usageCount - a.usageCount)
@@ -481,7 +483,7 @@ function App() {
                   favoriteTools={preferences.favoriteTools}
                   searchQuery={filterQuery}
                   onToolClick={handleToolClick}
-                  toolUsageStats={preferences.toolUsageStats}
+                  toolUsageStats={preferences.toolUsageStats || {}}
                 />
               );
             })}

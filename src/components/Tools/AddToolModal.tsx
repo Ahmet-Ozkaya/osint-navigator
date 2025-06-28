@@ -198,7 +198,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
                       type="url"
                       value={formData.url}
                       onChange={(e) => handleInputChange('url', e.target.value)}
-                      placeholder="https://example.com/search?q={{query}}"
+                      placeholder="https://example.com/search?q=YOUR_INPUT"
                       className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.url ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
                       }`}
@@ -211,7 +211,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
                     </div>
                   )}
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Use {{query}} as placeholder for search input
+                    Use YOUR_INPUT as placeholder for search input
                   </p>
                 </div>
 

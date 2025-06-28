@@ -25,8 +25,9 @@ function App() {
     workspaceLayout: 'grid'
   });
 
-  // Custom tools stored separately
+  // Custom tools stored separately with force update trigger
   const [customTools, setCustomTools] = useLocalStorage<OSINTTool[]>('custom-osint-tools', []);
+  const [customToolsUpdateTrigger, setCustomToolsUpdateTrigger] = useState(0);
 
   // LLM configurations
   const [llmConfigs, setLlmConfigs] = useLocalStorage<LLMConfig[]>('llm-configs', []);
@@ -42,6 +43,22 @@ function App() {
   const [inputType, setInputType] = useState<string>('unknown');
   const [previousInput, setPreviousInput] = useState(''); // Track previous input for cache clearing
 
+  // Enhanced custom tools setter that triggers immediate updates
+  const updateCustomTools = (newTools: OSINTTool[] | ((prev: OSINTTool[]) => OSINTTool[])) => {
+    const updatedTools = typeof newTools === 'function' ? newTools(customTools) : newTools;
+    setCustomTools(updatedTools);
+    // Force immediate re-render by updating trigger
+    setCustomToolsUpdateTrigger(prev => prev + 1);
+    
+    // If custom category wasn't expanded and we now have tools, expand it
+    if (updatedTools.length > 0 && !expandedCategories['custom']) {
+      setExpandedCategories(prev => ({
+        ...prev,
+        custom: true
+      }));
+    }
+  };
+
   // Sync theme with preferences
   useEffect(() => {
     if (preferences.theme !== theme) {
@@ -49,7 +66,7 @@ function App() {
     }
   }, [theme, preferences.theme, setPreferences]);
 
-  // Initialize expanded categories
+  // Initialize expanded categories and handle custom tools changes
   useEffect(() => {
     const initialExpanded: Record<string, boolean> = {};
     osintCategories.forEach(category => {
@@ -59,8 +76,8 @@ function App() {
     if (customTools.length > 0) {
       initialExpanded['custom'] = true;
     }
-    setExpandedCategories(initialExpanded);
-  }, [customTools.length]);
+    setExpandedCategories(prev => ({ ...prev, ...initialExpanded }));
+  }, [customTools.length, customToolsUpdateTrigger]); // Include trigger in dependencies
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -318,7 +335,10 @@ function App() {
     });
   };
 
-  const categoriesWithFavorites = getCategoriesWithFavorites();
+  // Memoize categories to prevent unnecessary re-renders, but include custom tools trigger
+  const categoriesWithFavorites = React.useMemo(() => {
+    return getCategoriesWithFavorites();
+  }, [preferences.favoriteTools, customTools, customToolsUpdateTrigger]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
@@ -404,7 +424,7 @@ function App() {
               
               return (
                 <ToolCategoryComponent
-                  key={category.id}
+                  key={`${category.id}-${customToolsUpdateTrigger}`} // Force re-render with trigger
                   category={category}
                   tools={filteredTools}
                   isExpanded={expandedCategories[category.id] || false}
@@ -435,6 +455,8 @@ function App() {
         onClose={() => setIsSettingsOpen(false)}
         onConfigSave={setLlmConfigs}
         currentConfigs={llmConfigs}
+        customTools={customTools}
+        onCustomToolsChange={updateCustomTools}
       />
 
       {/* Info Modal */}

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Settings, TestTube, Check, AlertCircle, Eye, EyeOff, Download, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LLMConfig, LLMProvider } from '../../types';
+import { LLMConfig, LLMProvider, OSINTTool } from '../../types';
 import { defaultLLMProviders } from '../../data/llmProviders';
 import { LLMService } from '../../services/llmService';
 import { ToolManagementModal } from '../Tools/ToolManagementModal';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
 import toast from 'react-hot-toast';
 
 interface LLMConfigModalProps {
@@ -13,13 +12,17 @@ interface LLMConfigModalProps {
   onClose: () => void;
   onConfigSave: (configs: LLMConfig[]) => void;
   currentConfigs: LLMConfig[];
+  customTools: OSINTTool[];
+  onCustomToolsChange: (tools: OSINTTool[] | ((prev: OSINTTool[]) => OSINTTool[])) => void;
 }
 
 export const LLMConfigModal: React.FC<LLMConfigModalProps> = ({
   isOpen,
   onClose,
   onConfigSave,
-  currentConfigs
+  currentConfigs,
+  customTools,
+  onCustomToolsChange
 }) => {
   const [configs, setConfigs] = useState<LLMConfig[]>(currentConfigs);
   const [customProviders, setCustomProviders] = useState<LLMProvider[]>([]);
@@ -27,7 +30,6 @@ export const LLMConfigModal: React.FC<LLMConfigModalProps> = ({
   const [testingConfig, setTestingConfig] = useState<string | null>(null);
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [isToolManagementOpen, setIsToolManagementOpen] = useState(false);
-  const [customTools, setCustomTools] = useLocalStorage('custom-osint-tools', []);
 
   useEffect(() => {
     setConfigs(currentConfigs);
@@ -642,7 +644,7 @@ export const LLMConfigModal: React.FC<LLMConfigModalProps> = ({
         isOpen={isToolManagementOpen}
         onClose={() => setIsToolManagementOpen(false)}
         customTools={customTools}
-        onCustomToolsChange={setCustomTools}
+        onCustomToolsChange={onCustomToolsChange}
       />
     </>
   );

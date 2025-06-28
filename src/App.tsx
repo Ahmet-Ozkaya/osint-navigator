@@ -5,7 +5,9 @@ import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { SearchBar } from './components/Search/SearchBar';
 import { FilterBar } from './components/Search/FilterBar';
+import { ViewControls } from './components/Tools/ViewControls';
 import { ToolCategoryComponent } from './components/Tools/ToolCategory';
+import { HistoryBox } from './components/History/HistoryBox';
 import { EnhancedAIAssistant } from './components/AI/EnhancedAIAssistant';
 import { InfoModal } from './components/Modals/InfoModal';
 import { ContactModal } from './components/Modals/ContactModal';
@@ -13,7 +15,7 @@ import { LLMConfigModal } from './components/AI/LLMConfigModal';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { osintCategories, getAllTools, searchTools, getFavoriteTools } from './data/osintTools';
-import { UserPreferences, OSINTTool, AIRecommendation, LLMConfig } from './types';
+import { UserPreferences, OSINTTool, AIRecommendation, LLMConfig, InvestigationHistory } from './types';
 import { detectInputType, encodeForUrl } from './utils/inputDetection';
 import toast from 'react-hot-toast';
 
@@ -24,7 +26,9 @@ function App() {
     favoriteTools: [],
     toolOrder: {},
     recentSearches: [],
-    workspaceLayout: 'grid'
+    workspaceLayout: 'grid',
+    viewMode: 'card',
+    investigationHistory: []
   });
 
   // Custom tools stored separately with force update trigger
@@ -37,6 +41,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('name');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -152,9 +157,19 @@ function App() {
       timestamp: new Date()
     };
     
+    // Add to investigation history
+    const historyItem: InvestigationHistory = {
+      id: Date.now().toString(),
+      input: query,
+      type: detectedType,
+      timestamp: new Date(),
+      toolsUsed: []
+    };
+    
     setPreferences(prev => ({
       ...prev,
-      recentSearches: [newSearch, ...prev.recentSearches.slice(0, 9)]
+      recentSearches: [newSearch, ...prev.recentSearches.slice(0, 9)],
+      investigationHistory: [historyItem, ...prev.investigationHistory.slice(0, 49)]
     }));
 
     toast.success(`Ready to investigate ${detectedType.toUpperCase()}: ${query}`);
@@ -274,6 +289,78 @@ function App() {
     toast.success(`AI recommended ${recommendation.tools.length} tools for your investigation`);
   };
 
+  const handleToolUpdate = (updatedTool: OSINTTool) => {
+    // Update tool in custom tools if it's a custom tool
+    if (customTools.find(t => t.id === updatedTool.id)) {
+      const updatedCustomTools = customTools.map(tool => 
+        tool.id === updatedTool.id ? updatedTool : tool
+      );
+      updateCustomTools(updatedCustomTools);
+    }
+    
+    // Update investigation history with tool usage
+    if (currentInput) {
+      setPreferences(prev => {
+        const updatedHistory = prev.investigationHistory.map(item => {
+          if (item.input === currentInput && !item.toolsUsed.includes(updatedTool.id)) {
+            return {
+              ...item,
+              toolsUsed: [...item.toolsUsed, updatedTool.id]
+            };
+          }
+          return item;
+        });
+        
+        return {
+          ...prev,
+          investigationHistory: updatedHistory
+        };
+      });
+    }
+  };
+
+  const handleHistorySelect = (historyItem: InvestigationHistory) => {
+    handleSearch(historyItem.input, historyItem.type);
+  };
+
+  const handleHistoryDelete = (id: string) => {
+    setPreferences(prev => ({
+      ...prev,
+      investigationHistory: prev.investigationHistory.filter(item => item.id !== id)
+    }));
+    toast.success('Investigation removed from history');
+  };
+
+  const handleClearHistory = () => {
+    setPreferences(prev => ({
+      ...prev,
+      investigationHistory: []
+    }));
+    toast.success('Investigation history cleared');
+  };
+
+  // Sort tools function
+  const sortTools = (tools: OSINTTool[]) => {
+    switch (sortBy) {
+      case 'name':
+        return [...tools].sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return [...tools].sort((a, b) => b.name.localeCompare(a.name));
+      case 'category':
+        return [...tools].sort((a, b) => a.category.localeCompare(b.category));
+      case 'recent':
+        return [...tools].sort((a, b) => {
+          const aTime = a.lastUsed ? new Date(a.lastUsed).getTime() : 0;
+          const bTime = b.lastUsed ? new Date(b.lastUsed).getTime() : 0;
+          return bTime - aTime;
+        });
+      case 'popular':
+        return [...tools].sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
+      default:
+        return tools;
+    }
+  };
+
   // Filter tools based on search query and active tags
   const getFilteredTools = (categoryTools: OSINTTool[]) => {
     let filtered = categoryTools;
@@ -294,7 +381,7 @@ function App() {
       );
     }
 
-    return filtered;
+    return sortTools(filtered);
   };
 
   // Get categories with favorites populated and custom tools included
@@ -416,6 +503,37 @@ function App() {
           </motion.div>
         )}
 
+        {/* History and View Controls */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* History Box */}
+          <div className="lg:col-span-1">
+            <HistoryBox
+              history={preferences.investigationHistory}
+              onHistorySelect={handleHistorySelect}
+              onHistoryDelete={handleHistoryDelete}
+              onClearAll={handleClearHistory}
+            />
+          </div>
+
+          {/* View Controls */}
+          <div className="lg:col-span-2">
+            <ViewControls
+              viewMode={preferences.viewMode}
+              onViewModeChange={(mode) => setPreferences(prev => ({ ...prev, viewMode: mode }))}
+              searchQuery={filterQuery}
+              onSearchChange={setFilterQuery}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              activeTags={activeTags}
+              onTagRemove={handleTagRemove}
+              onClearFilters={() => {
+                setFilterQuery('');
+                setActiveTags([]);
+              }}
+            />
+          </div>
+        </div>
+
         {/* Tool Categories */}
         <div className="space-y-6">
           <AnimatePresence>
@@ -436,6 +554,8 @@ function App() {
                   onToggleFavorite={handleToggleFavorite}
                   favoriteTools={preferences.favoriteTools}
                   searchQuery={filterQuery}
+                  viewMode={preferences.viewMode}
+                  onToolUpdate={handleToolUpdate}
                 />
               );
             })}

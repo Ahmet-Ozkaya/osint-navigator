@@ -11,6 +11,15 @@ export interface OSINTTool {
   status?: 'online' | 'offline' | 'slow' | 'unknown';
   usageCount?: number;
   lastUsed?: Date;
+  notes?: ToolNote[];
+}
+
+export interface ToolNote {
+  id: string;
+  content: string;
+  purpose: string;
+  timestamp: Date;
+  tags: string[];
 }
 
 export interface ToolCategory {
@@ -27,6 +36,15 @@ export interface SearchQuery {
   timestamp: Date;
 }
 
+export interface InvestigationHistory {
+  id: string;
+  input: string;
+  type: string;
+  timestamp: Date;
+  toolsUsed: string[];
+  notes?: string;
+}
+
 export interface AIRecommendation {
   tools: string[];
   reasoning: string;
@@ -40,6 +58,8 @@ export interface UserPreferences {
   toolOrder: Record<string, string[]>;
   recentSearches: SearchQuery[];
   workspaceLayout: 'grid' | 'list' | 'compact';
+  viewMode: 'card' | 'list';
+  investigationHistory: InvestigationHistory[];
 }
 
 export interface LLMProvider {

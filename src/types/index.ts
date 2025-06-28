@@ -40,6 +40,7 @@ export interface UserPreferences {
   toolOrder: Record<string, string[]>;
   recentSearches: SearchQuery[];
   workspaceLayout: 'grid' | 'list' | 'compact';
+  toolUsageStats: Record<string, { count: number; lastUsed: Date }>;
 }
 
 export interface LLMProvider {

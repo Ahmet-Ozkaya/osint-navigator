@@ -13,6 +13,8 @@ interface ToolCategoryProps {
   onToggleFavorite: (toolId: string) => void;
   favoriteTools: string[];
   searchQuery: string;
+  onToolClick: (toolId: string) => void;
+  toolUsageStats: Record<string, { count: number; lastUsed: Date }>;
 }
 
 export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
@@ -23,7 +25,9 @@ export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
   onTagClick,
   onToggleFavorite,
   favoriteTools,
-  searchQuery
+  searchQuery,
+  onToolClick,
+  toolUsageStats
 }) => {
   if (tools.length === 0) return null;
 
@@ -81,6 +85,9 @@ export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
                     onToggleFavorite={onToggleFavorite}
                     isFavorite={favoriteTools.includes(tool.id)}
                     searchQuery={searchQuery}
+                    onToolClick={onToolClick}
+                    usageCount={toolUsageStats[tool.id]?.count || 0}
+                    lastUsed={toolUsageStats[tool.id]?.lastUsed}
                   />
                 </motion.div>
               ))}

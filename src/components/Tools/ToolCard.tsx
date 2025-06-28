@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, Star, Clock, Zap, AlertCircle } from 'lucide-react';
+import { ExternalLink, Star, Clock, Zap, AlertCircle, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { OSINTTool } from '../../types';
 
@@ -9,6 +9,9 @@ interface ToolCardProps {
   onToggleFavorite: (toolId: string) => void;
   isFavorite: boolean;
   searchQuery?: string;
+  onToolClick: (toolId: string) => void;
+  usageCount?: number;
+  lastUsed?: Date;
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({
@@ -16,7 +19,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   onTagClick,
   onToggleFavorite,
   isFavorite,
-  searchQuery
+  searchQuery,
+  onToolClick,
+  usageCount = 0,
+  lastUsed
 }) => {
   const getStatusIcon = () => {
     switch (tool.status) {
@@ -46,6 +52,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    onToolClick(tool.id);
     window.open(tool.url, '_blank', 'noopener,noreferrer');
   };
 
@@ -62,7 +69,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       whileHover={{ y: -4, scale: 1.02 }}
-      className="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-2xl hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer overflow-hidden h-[280px] flex flex-col"
+      className="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-2xl hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer overflow-hidden h-[300px] flex flex-col"
       onClick={handleCardClick}
     >
       {/* Favorite star - Top Left */}
@@ -89,9 +96,19 @@ export const ToolCard: React.FC<ToolCardProps> = ({
         </div>
       </div>
 
-      {/* Standalone indicator - Top Right (below status) */}
-      {tool.isStandalone && (
+      {/* Usage counter - Top Right (below status) */}
+      {usageCount > 0 && (
         <div className="absolute top-12 right-3">
+          <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium flex items-center space-x-1">
+            <TrendingUp className="w-3 h-3" />
+            <span>{usageCount}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Standalone indicator */}
+      {tool.isStandalone && (
+        <div className="absolute top-12 right-3" style={{ top: usageCount > 0 ? '3.5rem' : '3rem' }}>
           <div className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full text-xs font-medium flex items-center space-x-1">
             <Zap className="w-3 h-3" />
             <span>Standalone</span>
@@ -138,13 +155,13 @@ export const ToolCard: React.FC<ToolCardProps> = ({
 
         {/* Usage stats - flex-grow to push external link to bottom */}
         <div className="flex-grow flex flex-col justify-end">
-          {tool.usageCount && (
+          {(usageCount > 0 || lastUsed) && (
             <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 mb-3">
               <Clock className="w-3 h-3 mr-1" />
-              Used {tool.usageCount} times
-              {tool.lastUsed && (
-                <span className="ml-2">
-                  • Last: {new Date(tool.lastUsed).toLocaleDateString()}
+              {usageCount > 0 && <span>Used {usageCount} times</span>}
+              {lastUsed && (
+                <span className={usageCount > 0 ? "ml-2" : ""}>
+                  {usageCount > 0 ? "• " : ""}Last: {new Date(lastUsed).toLocaleDateString()}
                 </span>
               )}
             </div>

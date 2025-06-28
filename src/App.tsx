@@ -6,6 +6,7 @@ import { Footer } from './components/Layout/Footer';
 import { SearchBar } from './components/Search/SearchBar';
 import { FilterBar } from './components/Search/FilterBar';
 import { ToolCategoryComponent } from './components/Tools/ToolCategory';
+import { TopToolsBox } from './components/Tools/TopToolsBox';
 import { EnhancedAIAssistant } from './components/AI/EnhancedAIAssistant';
 import { InfoModal } from './components/Modals/InfoModal';
 import { ContactModal } from './components/Modals/ContactModal';
@@ -24,7 +25,8 @@ function App() {
     favoriteTools: [],
     toolOrder: {},
     recentSearches: [],
-    workspaceLayout: 'grid'
+    workspaceLayout: 'grid',
+    toolUsageStats: {}
   });
 
   // Custom tools stored separately with force update trigger
@@ -274,6 +276,20 @@ function App() {
     toast.success(`AI recommended ${recommendation.tools.length} tools for your investigation`);
   };
 
+  const handleToolClick = (toolId: string) => {
+    const now = new Date();
+    setPreferences(prev => ({
+      ...prev,
+      toolUsageStats: {
+        ...prev.toolUsageStats,
+        [toolId]: {
+          count: (prev.toolUsageStats[toolId]?.count || 0) + 1,
+          lastUsed: now
+        }
+      }
+    }));
+  };
+
   // Filter tools based on search query and active tags
   const getFilteredTools = (categoryTools: OSINTTool[]) => {
     let filtered = categoryTools;
@@ -338,10 +354,30 @@ function App() {
     });
   };
 
+  // Get top 20 tools by usage
+  const getTopTools = () => {
+    const allTools = [...getAllTools(), ...customTools];
+    const toolsWithUsage = allTools
+      .map(tool => ({
+        tool,
+        usageCount: preferences.toolUsageStats[tool.id]?.count || 0,
+        lastUsed: preferences.toolUsageStats[tool.id]?.lastUsed
+      }))
+      .filter(item => item.usageCount > 0)
+      .sort((a, b) => b.usageCount - a.usageCount)
+      .slice(0, 20);
+    
+    return toolsWithUsage;
+  };
+
   // Memoize categories to prevent unnecessary re-renders, but include custom tools trigger
   const categoriesWithFavorites = React.useMemo(() => {
     return getCategoriesWithFavorites();
   }, [preferences.favoriteTools, customTools, customToolsUpdateTrigger]);
+
+  const topTools = React.useMemo(() => {
+    return getTopTools();
+  }, [preferences.toolUsageStats, customTools, customToolsUpdateTrigger]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
@@ -416,6 +452,14 @@ function App() {
           </motion.div>
         )}
 
+        {/* Top Tools Box */}
+        <TopToolsBox
+          tools={topTools}
+          onToolClick={handleToolClick}
+          onToggleFavorite={handleToggleFavorite}
+          favoriteTools={preferences.favoriteTools}
+        />
+
         {/* Tool Categories */}
         <div className="space-y-6">
           <AnimatePresence>
@@ -436,6 +480,8 @@ function App() {
                   onToggleFavorite={handleToggleFavorite}
                   favoriteTools={preferences.favoriteTools}
                   searchQuery={filterQuery}
+                  onToolClick={handleToolClick}
+                  toolUsageStats={preferences.toolUsageStats}
                 />
               );
             })}

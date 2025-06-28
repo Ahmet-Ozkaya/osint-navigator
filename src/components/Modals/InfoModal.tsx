@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search, Filter, Star, Shuffle, Zap, Bot, Settings, Shield, Target, Database, Globe, Mail, Bug, Users, ChevronRight, ChevronDown, Lightbulb, AlertTriangle, CheckCircle, Clock, ExternalLink } from 'lucide-react';
+import { X, Search, Filter, Star, Shuffle, Zap, Bot, Settings, Shield, Target, Database, Globe, Mail, Bug, Users, ChevronRight, ChevronDown, Lightbulb, AlertTriangle, CheckCircle, Clock, ExternalLink, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface InfoModalProps {

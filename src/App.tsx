@@ -24,6 +24,9 @@ function App() {
     workspaceLayout: 'grid'
   });
 
+  // Custom tools stored separately
+  const [customTools, setCustomTools] = useLocalStorage<OSINTTool[]>('custom-osint-tools', []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
@@ -129,8 +132,10 @@ function App() {
     const isIP = type === 'ip';
     const isEmail = type === 'email';
     
-    // Update URLs for non-standalone tools
-    getAllTools().forEach(tool => {
+    // Update URLs for both built-in and custom tools
+    const allTools = [...getAllTools(), ...customTools];
+    
+    allTools.forEach(tool => {
       if (tool.isStandalone) return;
       
       // Store original base URL if not already stored
@@ -223,7 +228,8 @@ function App() {
   const handleAIRecommendation = (recommendation: AIRecommendation) => {
     // Auto-expand relevant categories and highlight recommended tools
     recommendation.tools.forEach(toolId => {
-      const tool = getAllTools().find(t => t.id === toolId);
+      const allTools = [...getAllTools(), ...customTools];
+      const tool = allTools.find(t => t.id === toolId);
       if (tool) {
         setExpandedCategories(prev => ({
           ...prev,
@@ -258,15 +264,41 @@ function App() {
     return filtered;
   };
 
-  // Get categories with favorites populated
+  // Get categories with favorites populated and custom tools included
   const getCategoriesWithFavorites = () => {
-    const favoriteTools = getFavoriteTools(preferences.favoriteTools);
+    const allTools = [...getAllTools(), ...customTools];
+    const favoriteTools = getFavoriteTools(preferences.favoriteTools).concat(
+      customTools.filter(tool => preferences.favoriteTools.includes(tool.id))
+    );
     
-    return osintCategories.map(category => {
+    const categoriesWithCustom = [...osintCategories];
+    
+    // Add custom tools category if there are custom tools
+    if (customTools.length > 0) {
+      const customCategory = categoriesWithCustom.find(cat => cat.id === 'custom');
+      if (!customCategory) {
+        categoriesWithCustom.push({
+          id: 'custom',
+          name: 'Custom Tools',
+          description: 'Your custom OSINT tools',
+          icon: '⚙️',
+          tools: customTools
+        });
+      } else {
+        customCategory.tools = customTools;
+      }
+    }
+    
+    return categoriesWithCustom.map(category => {
       if (category.id === 'favorites') {
         return {
           ...category,
           tools: favoriteTools
+        };
+      } else if (category.id === 'custom') {
+        return {
+          ...category,
+          tools: customTools
         };
       }
       return category;

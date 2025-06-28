@@ -1,0 +1,16 @@
+{
+  "name": "OSINT Navigator Dashboard",
+  "short_name": "OSINT Navigator",
+  "description": "Professional OSINT Investigation Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

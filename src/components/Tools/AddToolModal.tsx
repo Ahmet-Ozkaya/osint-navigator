@@ -54,6 +54,15 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
     setErrors({});
   }, [editingTool, isOpen]);
 
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      const url = new URL(urlString);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -63,12 +72,8 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
 
     if (!formData.url.trim()) {
       newErrors.url = 'URL is required';
-    } else {
-      try {
-        new URL(formData.url);
-      } catch {
-        newErrors.url = 'Please enter a valid URL';
-      }
+    } else if (!isValidUrl(formData.url.trim())) {
+      newErrors.url = 'Please enter a valid URL (must start with http:// or https://)';
     }
 
     if (!formData.description.trim()) {
@@ -195,7 +200,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
                       <Link className="w-4 h-4 text-slate-400" />
                     </div>
                     <input
-                      type="url"
+                      type="text"
                       value={formData.url}
                       onChange={(e) => handleInputChange('url', e.target.value)}
                       placeholder="https://example.com/search?q=YOUR_INPUT"
@@ -211,7 +216,7 @@ export const AddToolModal: React.FC<AddToolModalProps> = ({
                     </div>
                   )}
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Use YOUR_INPUT as placeholder for search input
+                    Use YOUR_INPUT as placeholder for search input. Must start with http:// or https://
                   </p>
                 </div>
 

@@ -3,7 +3,6 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ToolCategory as ToolCategoryType, OSINTTool } from '../../types';
 import { ToolCard } from './ToolCard';
-import { ToolListView } from './ToolListView';
 
 interface ToolCategoryProps {
   category: ToolCategoryType;
@@ -14,8 +13,6 @@ interface ToolCategoryProps {
   onToggleFavorite: (toolId: string) => void;
   favoriteTools: string[];
   searchQuery: string;
-  viewMode: 'card' | 'list';
-  onToolUpdate: (tool: OSINTTool) => void;
 }
 
 export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
@@ -26,9 +23,7 @@ export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
   onTagClick,
   onToggleFavorite,
   favoriteTools,
-  searchQuery,
-  viewMode,
-  onToolUpdate
+  searchQuery
 }) => {
   if (tools.length === 0) return null;
 
@@ -72,35 +67,24 @@ export const ToolCategoryComponent: React.FC<ToolCategoryProps> = ({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            {viewMode === 'card' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {tools.map((tool, index) => (
-                  <motion.div
-                    key={tool.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <ToolCard
-                      tool={tool}
-                      onTagClick={onTagClick}
-                      onToggleFavorite={onToggleFavorite}
-                      isFavorite={favoriteTools.includes(tool.id)}
-                      searchQuery={searchQuery}
-                      onToolUpdate={onToolUpdate}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <ToolListView
-                tools={tools}
-                onTagClick={onTagClick}
-                onToggleFavorite={onToggleFavorite}
-                favoriteTools={favoriteTools}
-                onToolUpdate={onToolUpdate}
-              />
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {tools.map((tool, index) => (
+                <motion.div
+                  key={tool.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <ToolCard
+                    tool={tool}
+                    onTagClick={onTagClick}
+                    onToggleFavorite={onToggleFavorite}
+                    isFavorite={favoriteTools.includes(tool.id)}
+                    searchQuery={searchQuery}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

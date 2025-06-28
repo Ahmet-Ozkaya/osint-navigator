@@ -102,6 +102,12 @@ export const ToolManagementModal: React.FC<ToolManagementModalProps> = ({
             
             onCustomToolsChange([...customTools, ...newCustomTools]);
             toast.success(`Imported ${newCustomTools.length} new tools!`);
+            
+            // Close the modal after successful import
+            setTimeout(() => {
+              onClose();
+            }, 1500); // Give time for the success toast to be seen
+            
           } else {
             toast.error('Invalid JSON format. Expected tools array.');
           }
@@ -132,6 +138,11 @@ export const ToolManagementModal: React.FC<ToolManagementModalProps> = ({
           
           onCustomToolsChange([...customTools, ...newCustomTools]);
           toast.success(`Imported ${newCustomTools.length} tools from CSV!`);
+          
+          // Close the modal after successful import
+          setTimeout(() => {
+            onClose();
+          }, 1500); // Give time for the success toast to be seen
         }
       } catch (error) {
         toast.error('Failed to import file. Please check the format.');
@@ -358,6 +369,7 @@ export const ToolManagementModal: React.FC<ToolManagementModalProps> = ({
                         <li>• Custom tools are stored locally in your browser</li>
                         <li>• JSON format preserves all metadata</li>
                         <li>• CSV format supports basic tool information</li>
+                        <li>• Modal will close automatically after successful import</li>
                       </ul>
                     </div>
                   </div>

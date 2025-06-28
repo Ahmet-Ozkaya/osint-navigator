@@ -50,8 +50,12 @@ function App() {
     osintCategories.forEach(category => {
       initialExpanded[category.id] = category.id === 'favorites' || category.id === 'threat-intel';
     });
+    // Also expand custom category if there are custom tools
+    if (customTools.length > 0) {
+      initialExpanded['custom'] = true;
+    }
     setExpandedCategories(initialExpanded);
-  }, []);
+  }, [customTools.length]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -267,16 +271,16 @@ function App() {
   // Get categories with favorites populated and custom tools included
   const getCategoriesWithFavorites = () => {
     const allTools = [...getAllTools(), ...customTools];
-    const favoriteTools = getFavoriteTools(preferences.favoriteTools).concat(
-      customTools.filter(tool => preferences.favoriteTools.includes(tool.id))
-    );
+    const favoriteTools = preferences.favoriteTools
+      .map(id => allTools.find(tool => tool.id === id))
+      .filter(Boolean) as OSINTTool[];
     
     const categoriesWithCustom = [...osintCategories];
     
     // Add custom tools category if there are custom tools
     if (customTools.length > 0) {
-      const customCategory = categoriesWithCustom.find(cat => cat.id === 'custom');
-      if (!customCategory) {
+      const existingCustomCategory = categoriesWithCustom.find(cat => cat.id === 'custom');
+      if (!existingCustomCategory) {
         categoriesWithCustom.push({
           id: 'custom',
           name: 'Custom Tools',
@@ -285,7 +289,7 @@ function App() {
           tools: customTools
         });
       } else {
-        customCategory.tools = customTools;
+        existingCustomCategory.tools = customTools;
       }
     }
     
@@ -384,6 +388,9 @@ function App() {
           <AnimatePresence>
             {categoriesWithFavorites.map((category) => {
               const filteredTools = getFilteredTools(category.tools);
+              
+              // Only render categories that have tools after filtering
+              if (filteredTools.length === 0) return null;
               
               return (
                 <ToolCategoryComponent

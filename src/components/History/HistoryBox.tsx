@@ -21,17 +21,14 @@ export const HistoryBox: React.FC<HistoryBoxProps> = ({
   const [filterType, setFilterType] = useState<string>('all');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Defensive check to ensure history is always an array
-  const safeHistory = Array.isArray(history) ? history : [];
-
-  const filteredHistory = safeHistory.filter(item => {
+  const filteredHistory = history.filter(item => {
     const matchesSearch = item.input.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'all' || item.type === filterType;
     return matchesSearch && matchesType;
   });
 
-  const uniqueTypes = Array.from(new Set(safeHistory.map(item => item.type)));
+  const uniqueTypes = Array.from(new Set(history.map(item => item.type)));
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -72,7 +69,7 @@ export const HistoryBox: React.FC<HistoryBoxProps> = ({
               Investigation History
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {safeHistory.length} investigations • {filteredHistory.length} shown
+              {history.length} investigations • {filteredHistory.length} shown
             </p>
           </div>
         </div>
@@ -86,7 +83,7 @@ export const HistoryBox: React.FC<HistoryBoxProps> = ({
           >
             <Search className="w-4 h-4 text-slate-500" />
           </motion.button>
-          {safeHistory.length > 0 && (
+          {history.length > 0 && (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -144,7 +141,7 @@ export const HistoryBox: React.FC<HistoryBoxProps> = ({
           <div className="p-6 text-center">
             <Clock className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
             <p className="text-slate-500 dark:text-slate-400">
-              {safeHistory.length === 0 ? 'No investigations yet' : 'No matching investigations'}
+              {history.length === 0 ? 'No investigations yet' : 'No matching investigations'}
             </p>
           </div>
         ) : (

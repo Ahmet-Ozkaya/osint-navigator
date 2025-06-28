@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Sun, Search, Bot, Info } from 'lucide-react';
+import { Moon, Sun, Search, Bot, Info, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface HeaderProps {
@@ -7,13 +7,15 @@ interface HeaderProps {
   onToggleTheme: () => void;
   onToggleAI: () => void;
   onShowInfo: () => void;
+  onShowSettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   theme,
   onToggleTheme,
   onToggleAI,
-  onShowInfo
+  onShowInfo,
+  onShowSettings
 }) => {
   // Choose badge based on theme
   const boltBadgeUrl = theme === 'light' 
@@ -106,6 +108,18 @@ export const Header: React.FC<HeaderProps> = ({
                 <Moon className="w-5 h-5 text-slate-700" />
               )}
             </motion.button>
+
+            {onShowSettings && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onShowSettings}
+                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-all duration-200"
+                title="Settings"
+              >
+                <Settings className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+              </motion.button>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.05 }}

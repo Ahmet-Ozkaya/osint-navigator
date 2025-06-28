@@ -7,10 +7,11 @@ import { FilterBar } from './components/Search/FilterBar';
 import { ToolCategoryComponent } from './components/Tools/ToolCategory';
 import { EnhancedAIAssistant } from './components/AI/EnhancedAIAssistant';
 import { InfoModal } from './components/Modals/InfoModal';
+import { LLMConfigModal } from './components/AI/LLMConfigModal';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { osintCategories, getAllTools, searchTools, getFavoriteTools } from './data/osintTools';
-import { UserPreferences, OSINTTool, AIRecommendation } from './types';
+import { UserPreferences, OSINTTool, AIRecommendation, LLMConfig } from './types';
 import { detectInputType, encodeForUrl } from './utils/inputDetection';
 import toast from 'react-hot-toast';
 
@@ -27,12 +28,16 @@ function App() {
   // Custom tools stored separately
   const [customTools, setCustomTools] = useLocalStorage<OSINTTool[]>('custom-osint-tools', []);
 
+  // LLM configurations
+  const [llmConfigs, setLlmConfigs] = useLocalStorage<LLMConfig[]>('llm-configs', []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [currentInput, setCurrentInput] = useState('');
   const [inputType, setInputType] = useState<string>('unknown');
   const [previousInput, setPreviousInput] = useState(''); // Track previous input for cache clearing
@@ -73,6 +78,10 @@ function App() {
           case '/':
             e.preventDefault();
             setIsAIOpen(true);
+            break;
+          case ',':
+            e.preventDefault();
+            setIsSettingsOpen(true);
             break;
         }
       }
@@ -318,6 +327,7 @@ function App() {
         onToggleTheme={toggleTheme}
         onToggleAI={() => setIsAIOpen(true)}
         onShowInfo={() => setIsInfoOpen(true)}
+        onShowSettings={() => setIsSettingsOpen(true)}
       />
 
       <main className="container mx-auto px-4 py-8 space-y-8">
@@ -417,6 +427,14 @@ function App() {
         onRecommendation={handleAIRecommendation}
         currentInput={currentInput}
         inputType={inputType}
+      />
+
+      {/* Settings Modal */}
+      <LLMConfigModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onConfigSave={setLlmConfigs}
+        currentConfigs={llmConfigs}
       />
 
       {/* Info Modal */}

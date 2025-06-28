@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './components/Layout/Header';
+import { Footer } from './components/Layout/Footer';
 import { SearchBar } from './components/Search/SearchBar';
 import { FilterBar } from './components/Search/FilterBar';
 import { ToolCategoryComponent } from './components/Tools/ToolCategory';
 import { EnhancedAIAssistant } from './components/AI/EnhancedAIAssistant';
 import { InfoModal } from './components/Modals/InfoModal';
+import { ContactModal } from './components/Modals/ContactModal';
 import { LLMConfigModal } from './components/AI/LLMConfigModal';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -39,6 +41,7 @@ function App() {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
   const [currentInput, setCurrentInput] = useState('');
   const [inputType, setInputType] = useState<string>('unknown');
   const [previousInput, setPreviousInput] = useState(''); // Track previous input for cache clearing
@@ -440,6 +443,9 @@ function App() {
         </div>
       </main>
 
+      {/* Footer */}
+      <Footer onContactClick={() => setIsContactOpen(true)} />
+
       {/* Enhanced AI Assistant */}
       <EnhancedAIAssistant
         isOpen={isAIOpen}
@@ -463,6 +469,12 @@ function App() {
       <InfoModal
         isOpen={isInfoOpen}
         onClose={() => setIsInfoOpen(false)}
+      />
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
       />
 
       {/* Toast Notifications */}

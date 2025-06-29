@@ -154,5 +154,3 @@ export const TopToolsBox: React.FC<TopToolsBoxProps> = ({
     </motion.div>
   );
 };
-
-export { TopToolsBox }

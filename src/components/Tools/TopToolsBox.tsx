@@ -48,7 +48,7 @@ export const TopToolsBox: React.FC<TopToolsBoxProps> = ({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Top 20 Most Used Tools
+              Top 5 Most Used Tools
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Your most frequently accessed OSINT tools

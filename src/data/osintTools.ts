@@ -152,7 +152,7 @@ export const osintCategories: ToolCategory[] = [
   },
   {
     id: 'domain-analysis',
-    name: 'Domain & DNS Analysis',
+    name: 'Search, Domain & DNS Analysis',
     description: 'Domain registration and DNS investigation tools',
     icon: '🌍',
     tools: [

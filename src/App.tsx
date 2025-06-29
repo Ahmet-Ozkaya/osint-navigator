@@ -354,7 +354,7 @@ function App() {
     });
   };
 
-  // Get top 5 tools by usage
+  // Get top 12 tools by usage
   const getTopTools = () => {
     const allTools = [...getAllTools(), ...customTools];
     const safeToolUsageStats = preferences.toolUsageStats || {};
@@ -367,7 +367,7 @@ function App() {
       }))
       .filter(item => item.usageCount > 0)
       .sort((a, b) => b.usageCount - a.usageCount)
-      .slice(0, 5);
+      .slice(0, 12);
     
     return toolsWithUsage;
   };

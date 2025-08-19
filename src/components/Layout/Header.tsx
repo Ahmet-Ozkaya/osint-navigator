@@ -51,40 +51,6 @@ export const Header: React.FC<HeaderProps> = ({
           </motion.div>
 
           <div className="flex items-center space-x-2">
-            {/* Bolt.new Badge - Desktop */}
-            <motion.a
-              href="https://bolt.new"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden sm:block"
-              title="Built with Bolt.new"
-            >
-              <img
-                src={boltBadgeUrl}
-                alt="Built with Bolt.new"
-                className="w-10 h-10 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
-              />
-            </motion.a>
-
-            {/* Bolt.new Badge - Mobile (smaller) */}
-            <motion.a
-              href="https://bolt.new"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="sm:hidden block"
-              title="Built with Bolt.new"
-            >
-              <img
-                src={boltBadgeUrl}
-                alt="Built with Bolt.new"
-                className="w-8 h-8 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
-              />
-            </motion.a>
-
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

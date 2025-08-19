@@ -54,16 +54,6 @@ export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
                 <span>OSINT Resources</span>
                 <ExternalLink className="w-3 h-3" />
               </motion.a>
-              <motion.a
-                whileHover={{ x: 4 }}
-                href="https://bolt.new"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-                <span>Built with Bolt.new</span>
-                <ExternalLink className="w-3 h-3" />
-              </motion.a>
             </div>
           </div>
 

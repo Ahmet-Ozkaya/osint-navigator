@@ -9,7 +9,6 @@ import { ToolCategoryComponent } from './components/Tools/ToolCategory';
 import { TopToolsBox } from './components/Tools/TopToolsBox';
 import { EnhancedAIAssistant } from './components/AI/EnhancedAIAssistant';
 import { InfoModal } from './components/Modals/InfoModal';
-import { ContactModal } from './components/Modals/ContactModal';
 import { LLMConfigModal } from './components/AI/LLMConfigModal';
 import { useTheme } from './hooks/useTheme';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -43,7 +42,6 @@ function App() {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isContactOpen, setIsContactOpen] = useState(false);
   const [currentInput, setCurrentInput] = useState('');
   const [inputType, setInputType] = useState<string>('unknown');
   const [previousInput, setPreviousInput] = useState(''); // Track previous input for cache clearing
@@ -492,7 +490,7 @@ function App() {
       </main>
 
       {/* Footer */}
-      <Footer onContactClick={() => setIsContactOpen(true)} />
+      <Footer />
 
       {/* Enhanced AI Assistant */}
       <EnhancedAIAssistant
@@ -517,12 +515,6 @@ function App() {
       <InfoModal
         isOpen={isInfoOpen}
         onClose={() => setIsInfoOpen(false)}
-      />
-
-      {/* Contact Modal */}
-      <ContactModal
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
       />
 
       {/* Toast Notifications */}

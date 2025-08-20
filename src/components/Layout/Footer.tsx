@@ -1,12 +1,12 @@
 import React from 'react';
-import { Heart, Github, Mail, ExternalLink } from 'lucide-react';
+import { Heart, Github, Mail, ExternalLink, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface FooterProps {
-  onContactClick: () => void;
+  // No props needed anymore
 }
 
-export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
+export const Footer: React.FC<FooterProps> = () => {
   return (
     <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 mt-16">
       <div className="container mx-auto px-4 py-8">
@@ -37,13 +37,14 @@ export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
           <div className="space-y-4">
             <h4 className="font-semibold text-slate-900 dark:text-white">Quick Links</h4>
             <div className="space-y-2">
-              <motion.button
+              <motion.a
                 whileHover={{ x: 4 }}
-                onClick={onContactClick}
-                className="block text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                href="mailto:contact@nova-saas.com"
+                className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                Contact & Suggestions
-              </motion.button>
+                <Send className="w-3 h-3" />
+                <span>Contact & Suggestions</span>
+              </motion.a>
               <motion.a
                 whileHover={{ x: 4 }}
                 href="https://github.com/topics/osint"
@@ -95,14 +96,15 @@ export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
             </div>
             
             <div className="flex items-center space-x-6">
-              <motion.button
+              <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={onContactClick}
-                className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+                href="mailto:contact@nova-saas.com"
+                className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
               >
-                Send Feedback
-              </motion.button>
+                <Send className="w-3 h-3" />
+                <span>Send Feedback</span>
+              </motion.a>
               
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 © 2025 OSINT Navigator

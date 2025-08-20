@@ -16,6 +16,29 @@ interface FormData {
   details: string;
 }
 
+// Netlify Forms submission function
+const submitToNetlifyForms = async (formData: FormData) => {
+  const form = new FormData();
+  form.append('form-name', 'contact-suggestions');
+  form.append('name', formData.name);
+  form.append('email', formData.email);
+  form.append('phone', formData.phone);
+  form.append('suggestion-type', formData.suggestionType);
+  form.append('details', formData.details);
+
+  const response = await fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(form as any).toString()
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to submit form');
+  }
+
+  return response;
+};
+
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -43,20 +66,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
     setIsSubmitting(true);
     
     try {
-      // Submit to PHP backend
-      const response = await fetch('/api/contact.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit suggestion');
-      }
+      // Submit to Netlify Forms
+      await submitToNetlifyForms(formData);
       
       setIsSubmitted(true);
       toast.success('Thank you for your suggestion! We have received it and will review it soon.');

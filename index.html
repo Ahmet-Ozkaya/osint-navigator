@@ -11,6 +11,21 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Hidden Netlify form for form detection -->
+    <form name="contact-suggestions" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <select name="suggestion-type">
+        <option value="feature">Feature Request</option>
+        <option value="tool">New Tool Suggestion</option>
+        <option value="bug">Bug Report</option>
+        <option value="general">General Feedback</option>
+      </select>
+      <textarea name="details"></textarea>
+    </form>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

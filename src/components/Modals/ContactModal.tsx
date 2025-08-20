@@ -42,22 +42,24 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
 
     setIsSubmitting(true);
     
-    // Simulate form submission (in a real app, this would send to your backend)
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Store the suggestion locally for demo purposes
-      const suggestion = {
-        ...formData,
-        timestamp: new Date().toISOString(),
-        id: Date.now().toString()
-      };
-      
-      const existingSuggestions = JSON.parse(localStorage.getItem('osint-suggestions') || '[]');
-      localStorage.setItem('osint-suggestions', JSON.stringify([suggestion, ...existingSuggestions]));
+      // Submit to PHP backend
+      const response = await fetch('/api/contact.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit suggestion');
+      }
       
       setIsSubmitted(true);
-      toast.success('Thank you for your suggestion! We appreciate your feedback.');
+      toast.success('Thank you for your suggestion! We have received it and will review it soon.');
       
       // Reset form after a delay
       setTimeout(() => {
@@ -73,7 +75,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
       }, 2000);
       
     } catch (error) {
-      toast.error('Failed to submit suggestion. Please try again.');
+      toast.error(error instanceof Error ? error.message : 'Failed to submit suggestion. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -274,9 +276,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                       Privacy Notice
                     </h4>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      Your information will be stored locally in your browser for demo purposes. 
-                      In a production environment, this would be securely transmitted to our servers 
-                      and used only to respond to your inquiry and improve our services.
+                      Your information will be securely stored in our database and used only to respond 
+                      to your inquiry and improve our services. We respect your privacy and will never 
+                      share your information with third parties.
                     </p>
                   </div>
 
